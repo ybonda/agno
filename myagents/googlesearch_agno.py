@@ -11,8 +11,8 @@ MODEL= "google/gemini-2.5-flash-preview-05-20"
 
 agent = Agent(
     model=OpenRouter(id=MODEL),
-    # tools=[GoogleSearchTools(), Newspaper4kTools()],
-    tools=[GoogleSearchTools(fixed_language="English"), WebsiteTools()],
+    tools=[GoogleSearchTools(fixed_language="English")],
+    # tools=[GoogleSearchTools(fixed_language="English"), WebsiteTools()],
     # description="You are a news agent that helps users find the latest news.",
     # instructions=[
     #     "Given a topic by the user, respond with 4 latest news items about that topic.",
@@ -31,7 +31,7 @@ agent = Agent(
         " - Explain what are use cases.",
         " - Provide strong pros for why this tool is better than the alternatives based on actual search results.",
         " - Provide strong cons for why this tool is worse than the alternatives based on actual search results.",
-        " - Provide 1-3 alternative tools with cons and pros.",
+        " - Provide 1-3 alternative tools.",
         " Crawl pricing page and provide the pricing information.",
         " - You must fetch the latest details on their pricing plans, if pricing is available.",
     ],
@@ -40,7 +40,8 @@ agent = Agent(
     debug_mode=True,
 )
 
-agent.print_response("AI tool website: https://v0.dev/")
+agent.print_response("AI tool website: https://base44.com/")
+# agent.print_response("AI tool website: https://v0.dev/")
 # agent.print_response("AI tool website: https://emastered.com/", markdown=True)
 # agent.print_response("AI tool website: https://neosvg.com/", markdown=True)
 # agent.print_response("AI tool website: https://www.tavily.com/", markdown=True)
