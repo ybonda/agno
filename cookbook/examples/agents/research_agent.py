@@ -119,6 +119,11 @@ research_agent = Agent(
 
 # Example usage with detailed research request
 if __name__ == "__main__":
+    # research_agent.create_run_response(
+    #     "Investigate the impact of AI on global healthcare systems in 2024",
+    #     stream=True,
+    # )
+
     research_agent.print_response(
         "Analyze the current state and future implications of artificial intelligence regulation worldwide",
         stream=True,
