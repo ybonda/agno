@@ -23,7 +23,7 @@ agent = Agent(
     description="You are AI exprert that helps users find information about AI tools.",
     instructions=[
         "Given an AI tool website URL by a user, search the internet and respond in JSON format with",
-        " - name: name of the tool.",
+        " - name: crawl the name of the tool from the tool webpage content.",
         " - short_description: short description of the tool (12 words max).",
         " - description: detailed description of the tool (50-200 words)",
         " - how_it_works: Explain how the tool works.",
@@ -48,4 +48,5 @@ agent = Agent(
 # agent.print_response("AI tool website: https://emastered.com/")
 # agent.print_response("AI tool website: https://neosvg.com/", markdown=True)
 # agent.print_response("AI tool website: https://www.tavily.com/")
-agent.print_response("AI tool website: https://cline.bot/")
+# agent.print_response("AI tool website: https://cline.bot/")
+agent.print_response("AI tool website: https://www.trynia.ai/")
