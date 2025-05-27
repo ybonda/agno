@@ -178,7 +178,6 @@ pluggy==1.5.0
 posthog==3.7.5
 praw==7.8.1
 prawcore==2.4.0
--e git+ssh://git@github.com/ybonda/aigregator-prod-tools.git@467f0e71b90a168d34b223e52f5c301ee8e93c75#egg=pricingai&subdirectory=aigregator_ingestion/pricingai
 primp==0.15.0
 propcache==0.2.1
 Protego==0.4.0
