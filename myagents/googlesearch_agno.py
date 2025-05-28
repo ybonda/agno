@@ -29,6 +29,8 @@ agent = Agent(
         " - how_it_works: Based on the search results explain how the tool works.",
         " - how_to _use: Based on the search results explain how to use the tool.",
         " - use_cases: Based on the search results explain what are use cases.",
+        " - features: Based on the search results explain what are the main features.",
+        " - target_audience: Based on the search results explain who is the target audience.",
         " - pros: Provide 1-4 strong pros for why this tool is better than the alternatives based on actual search results.",
         " - cons: Provide 1-3 strong cons for why this tool is worse than the alternatives based on actual search results.",
         " - alternatives: Provide 1-3 alternative tools.",
@@ -36,7 +38,8 @@ agent = Agent(
         "- category: select the best matching single category ONLY from the list: Healthcare & Wellness, Gaming & Entertainment, Developer Tools, Image & Art, Education & Research, Productivity, 3D & Spatial, Audio & Voice, Lifestyle & Personal, Professional Services, Communication, News & Media, Business & Finance, Video & Animation, Content Creation, Social Impact, NSFW, Industry-Specific AI.",
         "Avoid in the response uncertainties, hedging, and phrases like 'I think', 'I believe', 'it seems', 'it looks like', 'it appears'.",
 
-        # " Crawl pricing page and provide the pricing information.",
+        # " Crawl pricing page and provide the pricing information." 
+        # ,
         # " - pricing_plans: an array of pricing plans, if pricing is available.",
     ],
     show_tool_calls=True,
