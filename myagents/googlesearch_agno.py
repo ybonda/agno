@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Optional
+from typing import List
 from dotenv import load_dotenv
 from agno.agent import Agent
 from agno.tools.googlesearch import GoogleSearchTools
@@ -16,11 +16,6 @@ try:
     from pymongo.errors import PyMongoError
 except ImportError:
     raise ImportError("`pymongo` not installed. Please install it with `pip install pymongo`")
-
-try:
-    from rapidfuzz import fuzz, process
-except ImportError:
-    raise ImportError("`rapidfuzz` not installed. Please install it with `pip install rapidfuzz`")
 
 # MODEL= "google/gemini-2.0-flash-001"
 # MODEL = "openai/gpt-4.1-nano"
@@ -81,97 +76,6 @@ def load_categories_from_db() -> List[str]:
         raise e
 
 
-def find_ai_tool_by_fuzzy_match(tool_name: str, threshold: int = 70) -> Optional[Dict]:
-    """
-    Find AI tool in database using fuzzy string matching.
-    
-    Args:
-        tool_name: The tool name to search for (from LLM alternatives)
-        threshold: Minimum similarity score (0-100) to consider a match
-        
-    Returns:
-        Dictionary with tool info and match score, or None if no match found
-    """
-    try:
-        db = get_mongodb_connection()
-        ai_tools_collection = db["ai_tools"]
-        
-        # Fetch all AI tools with relevant fields
-        tools_cursor = ai_tools_collection.find({}, {
-            "name": 1, 
-            "name_slug": 1, 
-            "description": 1, 
-            "ai_tool_url": 1,
-            "_id": 0
-        })
-        
-        tools = list(tools_cursor)
-        
-        if not tools:
-            print("No AI tools found in database")
-            return None
-        
-        best_match = None
-        best_score = 0
-        
-        # Normalize the search term
-        search_term = tool_name.lower().strip()
-        
-        for tool in tools:
-            # Calculate fuzzy match scores for different fields
-            name_score = fuzz.ratio(search_term, tool.get("name", "").lower())
-            slug_score = fuzz.ratio(search_term, tool.get("name_slug", "").lower())
-            
-            # Also try partial matching for better results
-            name_partial_score = fuzz.partial_ratio(search_term, tool.get("name", "").lower())
-            slug_partial_score = fuzz.partial_ratio(search_term, tool.get("name_slug", "").lower())
-            
-            # Take the highest score from all matching strategies
-            max_score = max(name_score, slug_score, name_partial_score, slug_partial_score)
-            
-            if max_score > best_score and max_score >= threshold:
-                best_score = max_score
-                best_match = {
-                    "tool": tool,
-                    "match_score": max_score,
-                    "matched_field": "name" if max(name_score, name_partial_score) >= max(slug_score, slug_partial_score) else "name_slug"
-                }
-        
-        return best_match
-        
-    except Exception as e:
-        print(f"Error searching for AI tool '{tool_name}': {e}")
-        return None
-
-
-def find_alternatives_in_db(alternatives: List[str]) -> List[Dict]:
-    """
-    Find multiple AI tool alternatives in database using fuzzy matching.
-    
-    Args:
-        alternatives: List of tool names from LLM response
-        
-    Returns:
-        List of dictionaries with found tools and their match info
-    """
-    found_tools = []
-    
-    for alt_name in alternatives:
-        match = find_ai_tool_by_fuzzy_match(alt_name)
-        if match:
-            found_tools.append({
-                "original_name": alt_name,
-                "found_tool": match["tool"],
-                "match_score": match["match_score"],
-                "matched_field": match["matched_field"]
-            })
-            print(f"✓ Found match for '{alt_name}': {match['tool']['name']} (score: {match['match_score']})")
-        else:
-            print(f"✗ No match found for '{alt_name}'")
-    
-    return found_tools
-
-
 # Load tags and categories from database
 tags = load_tags_from_db()
 categories = load_categories_from_db()
@@ -196,12 +100,12 @@ categories_str = ", ".join(categories)
 
 agent = Agent(
     model=OpenRouter(id=MODEL),
-    tools=[GoogleSearchTools(fixed_language="English", fixed_max_results=13)],
-    tool_call_limit=3,  # Limit to maximum 3 tool calls to control LLM usage
+    tools=[GoogleSearchTools(fixed_language="English", fixed_max_results=13, cache_results=True)],
+    tool_call_limit=2,  # Limit to maximum 2 tool calls to control LLM usage
     description="You are AI exprert that helps users find information about AI tools.",
     instructions=[
         "Given an AI tool website URL by a user, search the internet and respond in JSON format with",
-        "IMPORTANT: You have a maximum of 3 search calls, so make them count. Use comprehensive search queries.",
+        "IMPORTANT: You have a maximum of 2 search calls, so make them count. Use comprehensive search queries.",
         "For your first search, use the website URL directly to get basic information about the tool.",
         "If you need more information, make 1-2 additional targeted searches for specific details like pricing, features, or alternatives.",
         " - name: crawl the name of the tool from the tool webpage content.",
@@ -231,26 +135,8 @@ agent = Agent(
 # agent.print_response("AI tool website: https://v0.dev/")
 # agent.print_response("AI tool website: https://emastered.com/")
 # agent.print_response("AI tool website: https://neosvg.com/", markdown=True)
-# agent.print_response("AI tool website: https://www.tavily.com/")
+agent.print_response("AI tool website: https://www.tavily.com/")
 # agent.print_response("AI tool website: https://cline.bot/")
 # agent.print_response("AI tool website: https://www.trynia.ai/")
 # agent.print_response("AI tool website: https://www.waves.com/illugen")
 # agent.print_response("AI tool website: https://www.get-teleprompt.com/")
-
-# Example usage of fuzzy matching for alternatives
-print("\n" + "="*50)
-print("TESTING FUZZY MATCHING FOR ALTERNATIVES")
-print("="*50)
-
-# Example alternatives from LLM response
-sample_alternatives = ["Bubble.io", "Glide", "Replit", "Google AI Studio"]
-
-print(f"Searching for alternatives: {sample_alternatives}")
-print("-" * 30)
-
-found_alternatives = find_alternatives_in_db(sample_alternatives)
-
-print(f"\nFound {len(found_alternatives)} matches out of {len(sample_alternatives)} alternatives:")
-for match in found_alternatives:
-    tool = match["found_tool"]
-    print(f"  • {match['original_name']} → {tool['name']} ({tool['ai_tool_url']}) [Score: {match['match_score']}]")
