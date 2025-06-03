@@ -6,6 +6,7 @@ from agno.tools.googlesearch import GoogleSearchTools
 from agno.tools.newspaper4k import Newspaper4kTools
 from agno.tools.spider import SpiderTools
 from agno.tools.website import WebsiteTools
+from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.models.openrouter import OpenRouter
 
 # Load environment variables from .env file
@@ -100,7 +101,8 @@ categories_str = ", ".join(categories)
 
 agent = Agent(
     model=OpenRouter(id=MODEL),
-    tools=[GoogleSearchTools(fixed_language="English", fixed_max_results=13, cache_results=True)],
+    # tools=[GoogleSearchTools(fixed_language="English", fixed_max_results=13, cache_results=True)],
+    tools=[DuckDuckGoTools(fixed_max_results=23, search=True, news=True)],
     tool_call_limit=2,  # Limit to maximum 2 tool calls to control LLM usage
     description="You are AI exprert that helps users find information about AI tools.",
     instructions=[
@@ -131,7 +133,8 @@ agent = Agent(
     debug_mode=True,
 )
 
-agent.print_response("AI tool website: https://base44.com/")
+# agent.print_response("AI tool website: https://base44.com/")
+agent.print_response("AI tool website: https://groas.ai/")
 # agent.print_response("AI tool website: https://www.stagehand.dev/")
 # agent.print_response("AI tool website: https://v0.dev/")
 # agent.print_response("AI tool website: https://emastered.com/")
